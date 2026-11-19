@@ -21,6 +21,8 @@ type Settings struct {
 	DND             bool           `json:"dnd"`
 	Shake           bool           `json:"shake"`
 	ShakeLevel      ShakeLevel     `json:"shakeLevel"`
+	AutoArchive     bool           `json:"autoArchive"`   // archive the session a closed card asked in
+	ArchiveHinted   bool           `json:"archiveHinted"` // the one-time explanation of it was shown
 	Welcomed        bool           `json:"welcomed"`
 	WelcomedVersion string         `json:"welcomedVersion,omitempty"`
 	DebugPick       bool           `json:"debugPick,omitzero"`
@@ -28,7 +30,7 @@ type Settings struct {
 	Unknown         jsontext.Value `json:",embed"`
 }
 
-var defaults = Settings{Shake: true, ShakeLevel: ShakeMedium}
+var defaults = Settings{Shake: true, ShakeLevel: ShakeMedium, AutoArchive: true}
 
 // Store is settings.json in a home, safe for concurrent use.
 type Store struct {

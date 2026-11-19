@@ -14,7 +14,7 @@ import (
 
 const (
 	noticeW      = 380
-	hintW        = 520
+	hintW        = 640
 	hintH        = 64
 	hintFor      = 2600 * time.Millisecond
 	introFor     = 8 * time.Second

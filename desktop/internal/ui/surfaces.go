@@ -90,6 +90,9 @@ func (s surface) options(b mygo.Rectangle, preload string) mygo.WindowOptions {
 type Agent interface {
 	Request(msg jsontext.Value) bool
 	Open(sessionID string)
+	// Archive hides a session Pointy started from DSH's list; the plugin
+	// ignores one the user started.
+	Archive(sessionID string) bool
 }
 
 // Deps are what the windows reach outside this package.

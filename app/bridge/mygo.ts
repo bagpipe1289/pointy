@@ -171,8 +171,13 @@ export const Card = {
   asked(): Promise<void> {
     return call("Card.Asked");
   },
-  close(): Promise<void> {
-    return call("Card.Close");
+  /**
+   * Close closes the card. sessionID is the session it asked into, if any:
+   * closing a card that started a session archives it, so the question does
+   * not leave a session behind in DSH.
+   */
+  close(sessionID: string): Promise<void> {
+    return call("Card.Close", sessionID);
   },
   copy(text: string): Promise<void> {
     return call("Card.Copy", text);

@@ -35,7 +35,13 @@ func (s *Card) Init(ctx context.Context) contract.CardInit {
 // Send passes a request to the agent and reports whether it went out.
 func (s *Card) Send(ctx context.Context, msg jsontext.Value) bool { return s.u.deps.Agent.Request(msg) }
 
-func (s *Card) Close(ctx context.Context) { s.with(ctx, func(c *card) { c.win.Close() }) }
+// Close closes the card. sessionID is the session it asked into, if any:
+// closing a card that started a session archives it, so the question does
+// not leave a session behind in DSH.
+func (s *Card) Close(ctx context.Context, sessionID string) {
+	s.with(ctx, func(c *card) { c.win.Close() })
+	s.u.archiveSession(sessionID)
+}
 
 // OpenAgent closes the card and brings the agent forward.
 func (s *Card) OpenAgent(ctx context.Context, sessionID string) {

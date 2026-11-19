@@ -362,3 +362,32 @@ func TestAdoptStartsOrphanCheck(t *testing.T) {
 		t.Fatal("adopted Pointy outlived its host")
 	}
 }
+
+func TestArchive(t *testing.T) {
+	a := New(Deps{}, HostOptions{})
+	p := serve(t, a).connect(t)
+	if !a.Archive("s1") {
+		t.Fatal("archive not sent")
+	}
+	if m := p.read(); m["type"] != "archive" || m["sessionId"] != "s1" {
+		t.Fatalf("plugin got %v", m)
+	}
+	if a.Archive("") {
+		t.Fatal("sent an archive without a session")
+	}
+}
+
+func TestArchivedNotice(t *testing.T) {
+	archived := make(chan string, 1)
+	a := New(Deps{OnArchived: func(sessionID string) { archived <- sessionID }}, HostOptions{})
+	p := serve(t, a).connect(t)
+	p.send(map[string]any{"type": "archived", "sessionId": "s1"})
+	select {
+	case got := <-archived:
+		if got != "s1" {
+			t.Fatalf("archived %q", got)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("no archived notice")
+	}
+}

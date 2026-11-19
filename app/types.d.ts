@@ -32,7 +32,7 @@ interface CardApi {
   onInit(fn: (data: CardInit) => void): void
   onAgent(fn: (msg: AgentEvent) => void): void
   send(msg: CardRequest): Promise<boolean>
-  close(): void
+  close(sessionId?: string): void
   openAgent(sessionId?: string): void
   copy(text: string): void
   resize(height: number): void

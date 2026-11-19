@@ -20,6 +20,7 @@ var (
 	TrayShakeHigh          = key("tray.shakeHigh")
 	TrayGuide              = key("tray.guide")
 	TrayDND                = key("tray.dnd")
+	TrayAutoArchive        = key("tray.autoArchive")
 	TrayQuit               = key("tray.quit")
 
 	ApprovalTitle = key("approval.title")
@@ -29,6 +30,7 @@ var (
 	HintElevated   = key("hint.elevated")
 	HintNoHook     = key("hint.noHook")
 	HintWebSession = key("hint.webSession")
+	HintArchived   = key("hint.archived")
 
 	HintBlockedPassword = key("hint.blockedPassword")
 	HintBlockedLogin    = key("hint.blockedLogin")

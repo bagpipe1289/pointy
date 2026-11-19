@@ -114,6 +114,9 @@ func trayContent(d TrayDeps) (string, []*mygo.MenuItem) {
 			save(func(s *config.Settings) { s.DND = item.Checked })
 			d.Visibility.Changed()
 		}},
+		{Label: i18n.T(i18n.TrayAutoArchive), Type: mygo.MenuItemCheckbox, Checked: s.AutoArchive, Click: func(item *mygo.MenuItem, _ *mygo.Window) {
+			save(func(s *config.Settings) { s.AutoArchive = item.Checked })
+		}},
 		{Label: i18n.T(i18n.LanguageMenu), Submenu: languages},
 		mygo.Separator(),
 		{Label: i18n.T(i18n.TrayQuit), Click: func(*mygo.MenuItem, *mygo.Window) { d.Quit() }},

@@ -106,6 +106,7 @@ func start(home, root string, pages fs.FS, sys desktop.Desktop, logError func(st
 	dsh := agent.New(agent.Deps{
 		ToCards:         windows.ToCards,
 		OnTask:          windows.OnTask,
+		OnArchived:      windows.OnArchived,
 		ShowHint:        windows.ShowHint,
 		Notify:          func(title, body string, click func()) { tray.Notify(title, body, click) },
 		FocusTab:        exts.FocusTab,

@@ -86,7 +86,10 @@ func (u *UI) openPill(id string) {
 }
 
 func (u *UI) dismissPill(id string) {
-	if p := u.takePill(id); p != nil && !p.card.win.IsDestroyed() {
-		p.card.win.Destroy()
+	p := u.takePill(id)
+	if p == nil || p.card.win.IsDestroyed() {
+		return
 	}
+	p.card.win.Destroy()
+	u.archiveSession(p.sessionID)
 }

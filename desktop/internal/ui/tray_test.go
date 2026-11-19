@@ -105,3 +105,24 @@ func TestTraySaysTheLanguageChosenInIt(t *testing.T) {
 		t.Fatalf("back to the system: %q %q", settings.Get().Locale, tip)
 	}
 }
+
+func TestTrayTurnsAutoArchiveOff(t *testing.T) {
+	settings := config.LoadSettings(t.TempDir())
+	d := TrayDeps{Settings: settings, Visibility: NewVisibility(settings), Agent: func() agent.Status { return agent.Status{} }, Extensions: func() int { return 0 }}
+	_, items := trayContent(d)
+	item := find(items, "关闭卡片时归档会话")
+	if item == nil || !item.Checked || item.Type != mygo.MenuItemCheckbox {
+		t.Fatalf("auto-archive entry %+v", item)
+	}
+	if !settings.Get().AutoArchive {
+		t.Fatal("auto-archive off by default")
+	}
+	click(item)
+	if settings.Get().AutoArchive {
+		t.Fatal("auto-archive still on after turning it off")
+	}
+	_, items = trayContent(d)
+	if it := find(items, "关闭卡片时归档会话"); it.Checked {
+		t.Fatal("auto-archive still checked")
+	}
+}
