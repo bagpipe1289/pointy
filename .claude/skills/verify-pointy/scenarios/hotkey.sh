@@ -30,13 +30,14 @@ step() { zsh $S/$1 "${@:2}" || log "($1 ${@:2} failed)"; }
 until_true() { local end=$(( SECONDS + $1 )); shift; while (( SECONDS < end )); do "$@" > /dev/null 2>&1 && return 0; sleep 0.2; done; return 1; }
 logged() { tail -${2:-30} "$EV/run.log" | grep -qF -- "$1"; }
 keys_shown() { [ "$(js $(win notice.html) "return document.getElementById('keys').textContent")" = "$1" ]; }
+keys_not() { [ "$(js $(win notice.html) "return document.getElementById('keys').textContent")" != "$1" ]; }
 no_overlay() { ! has overlay.html; }
 no_notice() { ! has notice.html; }
 is_setting() { [ "$(setting $1)" = "$2" ]; }
 front_is() { [ "$(drive front)" = "$1" ]; }
 
 t() { python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["tray"][sys.argv[2]])' "$SRC/locales/zh-CN.json" $1; }
-HOTKEY=$(t hotkey) CUSTOM=$(t hotkeyCustom)
+HOTKEY=$(t hotkey) OFF=$(t hotkeyOff) CUSTOM=$(t hotkeyCustom)
 pointy=$(pid pointy)
 
 # 1. A preset from the tray is saved and bound.
@@ -84,4 +85,37 @@ sleep 0.6
 shot $wx $wy $ww $wh custom-pointing
 step keys.sh Esc both
 until_true 5 no_overlay
+
+# 5. A shortcut another app holds: the recorder never sees it, and Esc cancels
+#    without overwriting ⌘⌥K. Unlike Windows RegisterHotKey, macOS Carbon's
+#    RegisterEventHotKey (with options=0, as mygo calls it) does not return an
+#    error when another app also registered the chord, so conflict rejection on
+#    preset selection is only checked on Windows.
+"$BIN/drive" hold Cmd+Shift+Space "$VP_RUN/holder.out" 300 > "$VP_RUN/holder.log" 2>&1 &
+holder=$!
+print $holder > "$VP_RUN/pids/holder"
+expect "another process holds Cmd+Shift+Space" until_true 10 grep -q held "$VP_RUN/holder.out"
+grep -q held "$VP_RUN/holder.out" 2>/dev/null || log "holder.log: $(cat "$VP_RUN/holder.log" 2>/dev/null)"
+step tray.sh custom-taken "$HOTKEY" "$CUSTOM"
+expect "the recorder opens again" until_true 5 has notice.html
+sleep 0.5
+step keys.sh Cmd+Shift+Space pointy
+sleep 0.3
+expect "the recorder does not see a chord another app holds" keys_not ⌘⇧Space
+shot_page notice.html custom-taken
+step keys.sh Esc pointy
+expect "Esc cancels the recorder" until_true 5 no_notice
+expect "cancelling keeps Cmd+Alt+K" until_true 3 is_setting hotkey Cmd+Alt+K
+kill $holder 2>/dev/null || true
+
+# 6. Turning the shortcut off clears settings.json and unregisters ⌘⌥K.
+step tray.sh off "$HOTKEY" "$OFF"
+expect "turning off clears hotkey in settings.json" until_true 3 is_setting hotkey ""
+step tray.sh off-checked "$HOTKEY"
+expect "the tray checks Off" logged "[x] $OFF"
+zsh $S/fixture.sh > /dev/null
+guard; mine $cx $cy $te; drive move $cx $cy
+step keys.sh Cmd+Alt+K fixture
+sleep 1.2
+expect "⌘⌥K no longer starts pointing once off" no_overlay
 exit $(( failed > 0 ))
