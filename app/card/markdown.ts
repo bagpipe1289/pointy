@@ -19,7 +19,8 @@ const IMAGE_FILE = /\.(png|jpe?g|gif|webp|bmp|svg)$/i
 function localImage(raw: string) {
   let path = raw.replace(/&amp;/g, '&')
   if (/^file:\/\/\//i.test(path)) {
-    try { path = decodeURI(path.slice(7)) } catch { return undefined }
+    // decodeURI preserves %23. Handle it first so a literal %2523 is decoded only once.
+    try { path = decodeURI(path.slice(7).replace(/%23/g, '#')) } catch { return undefined }
     if (/^\/[a-z]:/i.test(path)) path = path.slice(1)
   }
   if (!isLocalPath(path) || !IMAGE_FILE.test(path)) return undefined
