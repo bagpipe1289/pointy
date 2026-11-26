@@ -38,6 +38,17 @@ test('file:/// image URLs are turned back into local paths', () => {
   assert.match(renderMarkdown('![x](file:///Users/me/a%20b.png)'), /data-path="\/Users\/me\/a b\.png"/)
 })
 
+test('file URL thumbnails and open-image paths preserve hashes in filenames', () => {
+  assert.equal(
+    renderMarkdown('![plan](file:///C:/pics/plan%232.png)'),
+    renderMarkdown('![plan](C:/pics/plan#2.png)'),
+  )
+  assert.equal(
+    renderMarkdown('![plan](file:///Users/me/plan%25232.png)'),
+    renderMarkdown('![plan](/Users/me/plan%232.png)'),
+  )
+})
+
 test('remote images and local non-image files in image syntax become links', () => {
   assert.equal(renderMarkdown('![猫](https://x.com/cat.png)'), '<a href="#" data-href="https://x.com/cat.png" title="https://x.com/cat.png">猫</a>')
   assert.equal(renderMarkdown('![](https://x.com/cat.png)'), '<a href="#" data-href="https://x.com/cat.png" title="https://x.com/cat.png">图片</a>')
