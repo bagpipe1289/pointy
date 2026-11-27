@@ -384,8 +384,7 @@ function fitMenu() {
   const h = menu.getBoundingClientRect().height
   const above = Math.max(0, r.top - 4)
   const below = Math.max(0, window.innerHeight - r.bottom - 4)
-  const opening = menuOpensUp === undefined
-  if (opening) menuOpensUp = h <= above || (h > below && above >= below)
+  if (menuOpensUp === undefined) menuOpensUp = h <= above
   const room = menuOpensUp ? above : below
   if (h > room) {
     // max-height applies to the content box. Leave space for padding and borders.
@@ -394,7 +393,7 @@ function fitMenu() {
   }
   menu.style.top = `${menuOpensUp ? Math.max(0, above - menu.getBoundingClientRect().height) : r.bottom + 4}px`
   menu.scrollTop = scrollTop
-  if (!opening || menuOpensUp || h <= room) return
+  if (menuOpensUp || h <= room) return
   const card = $('card')
   if (!card.style.height) {
     card.style.height = `${card.getBoundingClientRect().height}px`
