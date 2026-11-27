@@ -166,6 +166,7 @@ header { display: flex; align-items: center; gap: 8px; -webkit-app-region: drag;
 .sep { height: 1px; margin: 4px 6px; background: var(--line); }
 .menu-hint { padding: 4px 8px 2px; color: var(--faint); font-size: 11.5px; }
 .menu-search {
+  box-sizing: border-box;
   display: block; width: 100%; margin-bottom: 4px; padding: 6px 9px;
   border: 1px solid var(--line); border-radius: 8px; outline: none;
   background: var(--bg); color: var(--text); font: inherit; font-size: 13px;
